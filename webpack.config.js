@@ -1,29 +1,39 @@
 const path = require("path");
-const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./src/index.js",
-  mode: "development",
-  module: {
-    rules: [
-      {
-        test: /\.js$|jsx/,
-        exclude: /(node_modules|bower_components)/,
-        loader: "babel-loader",
-        options: { presets: ["@babel/env"] }
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"]
-      }
-    ]
-  },
-  resolve: { extensions: ["*", ".js", ".jsx"] },
+  entry: "./src/index.tsx",
+  target: "web",
+  mode: process.env.NODE_ENV || "development",
   output: {
     filename: "bundle.js",
     path: path.resolve("dist"),
     publicPath: "/",
   },
+  module: {
+    rules: [
+      {
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          use: ["babel-loader"],
+      },
+      {
+          test: /\.(ts|tsx)$/,
+          exclude: /node_modules/,
+          use: ["ts-loader"],
+      },
+      {
+          test: /\.(css|scss)$/,
+          use: ["style-loader", "css-loader"],
+      },
+      {
+          test: /\.(jpg|jpeg|png|gif|mp3|svg)$/,
+          use: ["file-loader"],
+      },
+  ],
+  },
+  resolve: { extensions: ["*", ".js", ".jsx", ".json", ".ts", ".tsx"] },
+  
   devServer: {
     // contentBase
     static : {
@@ -37,5 +47,9 @@ module.exports = {
     // hotOnly
     hot: "only",
   },
-  plugins: [new webpack.HotModuleReplacementPlugin()]
+  plugins: [
+    new HtmlWebpackPlugin({
+        template: path.join(__dirname, "public", "index.html"),
+    }),
+],
 };
